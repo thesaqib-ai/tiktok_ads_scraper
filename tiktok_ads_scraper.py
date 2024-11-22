@@ -291,8 +291,6 @@ def getTikTokAds():
         'Tech & Electronics', 'Accessories for Vehicles', 'Auto Accessories', 'Auto Parts'
     ]
     
-    st.write("Below is the list of all ad categories:")
-    
     # Display categories in a scrollable container
     with st.container():
         st.markdown("Below is the list of all ad categories:\n")
