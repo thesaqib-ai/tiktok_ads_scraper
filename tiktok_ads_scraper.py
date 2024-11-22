@@ -47,127 +47,129 @@ def sanitize_string(value):
 
 def getTikTokAds():
     st.title('TikTok Ads Scraper')
-    
-    # Check if both buttons have been clicked before to maintain state
-    if 'all_ads_downloaded' not in st.session_state:
-        st.session_state['all_ads_downloaded'] = False
-    if 'combined_ads_downloaded' not in st.session_state:
-        st.session_state['combined_ads_downloaded'] = False
+
+    # Initialize session state to store Excel files
+    if 'main_excel_stream' not in st.session_state:
+        st.session_state.main_excel_stream = None
+    if 'secondary_excel_stream' not in st.session_state:
+        st.session_state.secondary_excel_stream = None
 
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
-            # Load category data from a local file or replace with Streamlit secrets if needed.
-            data = st.secrets["CATEGORIES_JSON"]
-            json_data = json.loads(data)
+            try:
+                # Load category data from Streamlit secrets
+                data = st.secrets["CATEGORIES_JSON"]
+                json_data = json.loads(data)
 
-            industry_ids = [
-                "22102000000", "22101000000",
-                # "22107000000", "22108000000", "22109000000", "22106000000", "22999000000", "22112000000"
-                # Add more IDs as required...
-            ]
-            x_rapidapi_key = st.secrets["X-RAPIDAPI-KEY"]
-            url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads"
-            headers = {
-                "x-rapidapi-key": x_rapidapi_key,
-                "x-rapidapi-host": "tiktok-api23.p.rapidapi.com"
-            }
+                industry_ids = [
+                    "22102000000", "22101000000", 
+                    # "22107000000", "22108000000", 
+                    # "22109000000", "22106000000", "22999000000", "22112000000"
+                    # Add more IDs as required...
+                ]
+                x_rapidapi_key = st.secrets["X-RAPIDAPI-KEY"]
+                url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads"
+                headers = {
+                    "x-rapidapi-key": x_rapidapi_key,
+                    "x-rapidapi-host": "tiktok-api23.p.rapidapi.com"
+                }
 
-            main_excel_stream = BytesIO()
-            secondary_excel_stream = BytesIO()
+                main_excel_stream = BytesIO()
+                secondary_excel_stream = BytesIO()
 
-            with pd.ExcelWriter(main_excel_stream, engine='openpyxl') as writer_main, \
-                 pd.ExcelWriter(secondary_excel_stream, engine='openpyxl') as writer_secondary:
-                for industry_id in industry_ids:
-                    industry_name = get_industry_name(industry_id, json_data)
-                    sheet_name = industry_name if industry_name != "-" else f"Industry_{industry_id}"
-                    all_ad_data = []
-                    filtered_ad_data = []
-                    for page in range(1, 11):
-                        querystring = {
-                            "page": str(page),
-                            "period": "7",
-                            "limit": "10",
-                            "country": "US",
-                            "order_by": "ctr",
-                            "like": "1",
-                            "ad_format": "2",
-                            "industry": industry_id,
-                            "ad_language": "en"
-                        }
+                with pd.ExcelWriter(main_excel_stream, engine='openpyxl') as writer_main, \
+                     pd.ExcelWriter(secondary_excel_stream, engine='openpyxl') as writer_secondary:
+                    for industry_id in industry_ids:
+                        industry_name = get_industry_name(industry_id, json_data)
+                        sheet_name = industry_name if industry_name != "-" else f"Industry_{industry_id}"
+                        all_ad_data = []
+                        filtered_ad_data = []
+                        for page in range(1, 11):
+                            querystring = {
+                                "page": str(page),
+                                "period": "7",
+                                "limit": "10",
+                                "country": "US",
+                                "order_by": "ctr",
+                                "like": "1",
+                                "ad_format": "2",
+                                "industry": industry_id,
+                                "ad_language": "en"
+                            }
 
-                        try:
-                            response = requests.get(url, headers=headers, params=querystring)
-                            response.raise_for_status()
-                            ads = response.json().get('data', {}).get('materials', [])
+                            try:
+                                response = requests.get(url, headers=headers, params=querystring)
+                                response.raise_for_status()
+                                ads = response.json().get('data', {}).get('materials', [])
 
-                            for ad in ads:
-                                try:
-                                    details_url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads/detail"
-                                    details_querystring = {"ads_id": ad.get('id')}
-                                    ads_response = requests.get(details_url, headers=headers, params=details_querystring)
-                                    ads_response.raise_for_status()
-                                    detailed_ads = ads_response.json().get('data', {})
+                                for ad in ads:
+                                    try:
+                                        details_url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads/detail"
+                                        details_querystring = {"ads_id": ad.get('id')}
+                                        ads_response = requests.get(details_url, headers=headers, params=details_querystring)
+                                        ads_response.raise_for_status()
+                                        detailed_ads = ads_response.json().get('data', {})
 
-                                    ad_data = {
-                                        "Ad ID": ad.get('id'),
-                                        "Brand Name": sanitize_string(ad.get('brand_name')),
-                                        "Ad Industry": sanitize_string(get_industry_name(ad.get('industry_key'), json_data)),
-                                        "CTR": ad.get('ctr'),
-                                        "Ad Objective": sanitize_string(ad.get('objective_key')),
-                                        "Total Likes": ad.get('like'),
-                                        "Total Comments": detailed_ads.get('comment'),
-                                        "Total Shares": detailed_ads.get('share'),
-                                        "Video Url": ad.get('video_info', {}).get('video_url', {}).get('720p'),
-                                        "Video Cover URL": ad.get('video_info', {}).get('cover', {}),
-                                        "Video Duration": ad.get('video_info', {}).get('duration'),
-                                        "Landing Page": detailed_ads.get('landing_page'),
-                                        "Ad Description": sanitize_string(ad.get('ad_title'))
-                                    }
-                                    all_ad_data.append(ad_data)
+                                        ad_data = {
+                                            "Ad ID": ad.get('id'),
+                                            "Brand Name": sanitize_string(ad.get('brand_name')),
+                                            "Ad Industry": sanitize_string(get_industry_name(ad.get('industry_key'), json_data)),
+                                            "CTR": ad.get('ctr'),
+                                            "Ad Objective": sanitize_string(ad.get('objective_key')),
+                                            "Total Likes": ad.get('like'),
+                                            "Total Comments": detailed_ads.get('comment'),
+                                            "Total Shares": detailed_ads.get('share'),
+                                            "Video Url": ad.get('video_info', {}).get('video_url', {}).get('720p'),
+                                            "Video Cover URL": ad.get('video_info', {}).get('cover', {}),
+                                            "Video Duration": ad.get('video_info', {}).get('duration'),
+                                            "Landing Page": detailed_ads.get('landing_page'),
+                                            "Ad Description": sanitize_string(ad.get('ad_title'))
+                                        }
+                                        all_ad_data.append(ad_data)
 
-                                    if float(ad.get('ctr', 0)) >= 0.05 and int(ad.get('like', 0)) >= 2000 and int(detailed_ads.get('comment', 0)) >= 150:
-                                        filtered_ad_data.append(ad_data)
-                                except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
-                                    st.error(f"Error processing ad {ad.get('id')}: {e}")
-                        except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
-                            st.error(f"Error retrieving data for industry {industry_id} on page {page}: {e}")
+                                        if float(ad.get('ctr', 0)) >= 0.05 and int(ad.get('like', 0)) >= 2000 and int(detailed_ads.get('comment', 0)) >= 150:
+                                            filtered_ad_data.append(ad_data)
+                                    except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+                                        st.error(f"Error processing ad {ad.get('id')}: {e}")
+                            except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
+                                st.error(f"Error retrieving data for industry {industry_id} on page {page}: {e}")
 
-                    pd.DataFrame(all_ad_data).to_excel(writer_main, index=False, sheet_name=sheet_name)
-                    pd.DataFrame(filtered_ad_data).to_excel(writer_secondary, index=False, sheet_name=sheet_name)
+                        # Write all ads data to the main Excel file
+                        pd.DataFrame(all_ad_data).to_excel(writer_main, index=False, sheet_name=sheet_name)
+                        # Write filtered ads data to the secondary Excel file
+                        pd.DataFrame(filtered_ad_data).to_excel(writer_secondary, index=False, sheet_name=sheet_name)
 
-            st.success("Ads data processed successfully!")
+                # Store the Excel streams in session state
+                st.session_state.main_excel_stream = main_excel_stream
+                st.session_state.secondary_excel_stream = secondary_excel_stream
 
-            # Create a downloadable combined Excel file.
-            combined_data_stream = combine_excel_sheets(secondary_excel_stream, None)
+                st.success("Ads data processed successfully!")
 
-            # Allow the user to download the main ads data if it hasn't been downloaded yet
-            if not st.session_state['all_ads_downloaded']:
-                all_ads_button = st.download_button(
-                    "Download All Ads Data",
-                    main_excel_stream,
-                    file_name="tiktok_ads_data.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-                if all_ads_button:
-                    st.session_state['all_ads_downloaded'] = True
+            except Exception as e:
+                st.error(f"An unexpected error occurred: {e}")
 
-            # Allow the user to download the combined top ads data
-            if not st.session_state['combined_ads_downloaded']:
-                combined_ads_button = st.download_button(
-                    "Download Combined Top Ads Data",
-                    combined_data_stream,
-                    file_name="combined_top_tiktok_ads_data.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
-                if combined_ads_button:
-                    st.session_state['combined_ads_downloaded'] = True
-            else:
-                st.download_button(
-                    "Download Combined Top Ads Data Again",
-                    combined_data_stream,
-                    file_name="combined_top_tiktok_ads_data.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+    # Display download buttons only if the Excel files are available
+    if st.session_state.secondary_excel_stream and st.session_state.main_excel_stream:
+        combined_data_stream = combine_excel_sheets(st.session_state.secondary_excel_stream, None)
+        
+        st.markdown("### Download Files")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.download_button(
+                label="Download Combined Top Ads Data",
+                data=combined_data_stream,
+                file_name="combined_top_tiktok_ads_data.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
+        with col2:
+            st.download_button(
+                label="Download All Ads Data",
+                data=st.session_state.main_excel_stream,
+                file_name="tik_ads_data.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
 if __name__ == "__main__":
     getTikTokAds()
