@@ -59,7 +59,7 @@ def getTikTokAds():
                 "15103000000", "15101000000", "15102000000", "15104000000", "15106000000", "15107000000", "15999000000", "11111000000",
                 "11101000000", "11103000000"
             ]
-            x_rapidapi_key = st.secrets["x-rapidapi-key"]
+            x_rapidapi_key = st.secrets["X-RAPIDAPI-KEY"]
             url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads"
             headers = {
                 "x-rapidapi-key": x_rapidapi_key,
