@@ -45,6 +45,29 @@ def sanitize_string(value):
         return re.sub(r'[\x00-\x1F\x7F]', '', value)
     return value
 
+def load_categories(json_data):
+    """
+    Flattens the categories and subcategories into a list of dictionaries.
+    
+    Parameters:
+    json_data (list): The JSON data containing categories and subcategories.
+    
+    Returns:
+    list: A list of dictionaries with 'Industry ID' and 'Industry Name'.
+    """
+    categories_list = []
+    for category in json_data:
+        categories_list.append({
+            "Industry ID": category.get("id", ""),
+            "Industry Name": category.get("name", "")
+        })
+        for sub_category in category.get("sub_industry", []):
+            categories_list.append({
+                "Industry ID": sub_category.get("id", ""),
+                "Industry Name": sub_category.get("name", "")
+            })
+    return categories_list
+
 def getTikTokAds():
     # Custom CSS styling
     st.markdown("""
@@ -107,10 +130,55 @@ def getTikTokAds():
             .stSpinner>div>div {
                 border-top-color: #1DA1F2;
             }
+            /* Additional styling for the About section and categories table */
+            .about-section {
+                background-color: rgba(255, 255, 255, 0.85);
+                padding: 1em;
+                border-radius: 10px;
+                margin-bottom: 2em;
+            }
+            .categories-section {
+                background-color: rgba(255, 255, 255, 0.85);
+                padding: 1em;
+                border-radius: 10px;
+                margin-bottom: 2em;
+            }
         </style>
     """, unsafe_allow_html=True)
 
     st.title('TikTok Ads Scraper')
+
+    # About Section
+    st.markdown("""
+        <div class='about-section'>
+            <h2>About</h2>
+            <p>
+                This scraper is designed to fetch and analyze the top advertisements on TikTok. By leveraging TikTok's trending ads data, 
+                it provides detailed insights into various ad metrics such as CTR, total likes, comments, shares, and more. Whether you're 
+                a marketer looking to gauge ad performance or a researcher studying advertising trends, this tool offers valuable data 
+                to support your objectives.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Load and Display Categories
+    try:
+        categories_json = st.secrets["CATEGORIES_JSON"]
+        json_data = json.loads(categories_json)
+        categories_list = load_categories(json_data)
+        categories_df = pd.DataFrame(categories_list)
+
+        st.markdown("""
+            <div class='categories-section'>
+                <h2>Ad Categories</h2>
+            </div>
+        """, unsafe_allow_html=True)
+
+        st.dataframe(categories_df, use_container_width=True)
+    except KeyError:
+        st.error("CATEGORIES_JSON not found in Streamlit secrets.")
+    except json.JSONDecodeError:
+        st.error("Error decoding CATEGORIES_JSON. Please check the JSON format.")
 
     # Initialize session state to store Excel files
     if 'main_excel_stream' not in st.session_state:
@@ -121,9 +189,10 @@ def getTikTokAds():
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
             try:
-                # Load category data from Streamlit secrets
-                data = st.secrets["CATEGORIES_JSON"]
-                json_data = json.loads(data)
+                # Ensure json_data is loaded
+                if 'json_data' not in locals():
+                    data = st.secrets["CATEGORIES_JSON"]
+                    json_data = json.loads(data)
 
                 industry_ids = [
                     "22102000000", "22101000000", "22107000000", "22108000000", "22109000000", "22106000000", "22999000000", "22112000000",
