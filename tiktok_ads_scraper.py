@@ -271,5 +271,33 @@ def getTikTokAds():
             )
         st.markdown("</div>", unsafe_allow_html=True)
 
+    # List of ad categories
+    ad_categories = [
+        'Bags', 'Clothing Accessories', 'High end Jewelry', 'Mens Clothing', 'Mens Shoes',
+        'Ordinary Jewelry', 'Other Apparel & Accessories', 'Trad & Ceremonial Clothing', 
+        'Watches', 'Wearable Tech Devices', 'Womens Clothing', 'Womens Shoes', 'Digital Devices', 
+        'Home Appliances', 'Personal Care Appliances', 'Auto Services', 'Travel', 'Baby Bedding', 
+        'Baby Feeding Supplies', 'Child Car Seats', 'Childrens Apparel', 'Other Baby, Kids & Maternity', 
+        'Toys for Kids', 'Aesthetic Medicine', 'Cosmetics', 'Feminine Care', 'Fragrances & Perfumes', 
+        'Haircare', 'Oral Care', 'Skincare', 'Wig & Hair Styling', 'Constructional Engineering', 
+        'Environmental Protection', 'Legal Services', 'Marketing & Advertising', 'Other Business Services', 
+        'Professional Consultation', 'Real Estate & Home Rentals', 'Recruitment & Job Searching', 
+        'Big Box Retailers', 'Small & Medium Platforms', 'Education', 'Overseas Education', 'Astrology', 
+        'Beauty & Personal Care', 'Business & Economy', 'Collectables & Antiques', 'Culture & Art', 
+        'Culture & History', 'Food & Cooking', 'Pets', 'Other Pets', 'Pet Grooming', 'Pet Healthcare', 
+        'Pet Household Products', 'Pet Toys', 'Pet Travel Accessories', 'Pet Treats', 'Petfood', 
+        'Outdoor Equipment', 'Sports & Equipment', 'Cell Phones', 'Computer Accessories', 'Computer Repair', 
+        'Computers', 'Computers Components', 'Gaming Devices', 'Network Products', 'Office Equipment', 
+        'Tech & Electronics', 'Accessories for Vehicles', 'Auto Accessories', 'Auto Parts'
+    ]
+    
+    st.write("Below is the list of all ad categories:")
+    
+    # Display categories in a scrollable container
+    with st.container():
+        for category in ad_categories:
+            st.markdown(f"- **{category}**")
+
+
 if __name__ == "__main__":
     getTikTokAds()
