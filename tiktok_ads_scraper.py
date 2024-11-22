@@ -47,6 +47,13 @@ def sanitize_string(value):
 
 def getTikTokAds():
     st.title('TikTok Ads Scraper')
+    
+    # Check if both buttons have been clicked before to maintain state
+    if 'all_ads_downloaded' not in st.session_state:
+        st.session_state['all_ads_downloaded'] = False
+    if 'combined_ads_downloaded' not in st.session_state:
+        st.session_state['combined_ads_downloaded'] = False
+
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
             # Load category data from a local file or replace with Streamlit secrets if needed.
@@ -133,31 +140,28 @@ def getTikTokAds():
             # Create a downloadable combined Excel file.
             combined_data_stream = combine_excel_sheets(secondary_excel_stream, None)
 
-            if 'combined_data_downloaded' not in st.session_state:
-                st.session_state['combined_data_downloaded'] = False
+            # Allow the user to download the main ads data if it hasn't been downloaded yet
+            if not st.session_state['all_ads_downloaded']:
+                all_ads_button = st.download_button(
+                    "Download All Ads Data",
+                    main_excel_stream,
+                    file_name="tiktok_ads_data.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+                if all_ads_button:
+                    st.session_state['all_ads_downloaded'] = True
 
-            # Show the first download button for the all ads data
-            st.download_button(
-                "Download All Ads Data",
-                main_excel_stream,
-                file_name="tiktok_ads_data.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
-
-            # Show the second download button for the combined top ads if it has not been downloaded yet
-            if not st.session_state['combined_data_downloaded']:
-                download_button = st.download_button(
+            # Allow the user to download the combined top ads data
+            if not st.session_state['combined_ads_downloaded']:
+                combined_ads_button = st.download_button(
                     "Download Combined Top Ads Data",
                     combined_data_stream,
                     file_name="combined_top_tiktok_ads_data.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-
-                # Mark the combined data as downloaded when the button is clicked
-                if download_button:
-                    st.session_state['combined_data_downloaded'] = True
+                if combined_ads_button:
+                    st.session_state['combined_ads_downloaded'] = True
             else:
-                # If combined data was already downloaded, allow the user to re-download it
                 st.download_button(
                     "Download Combined Top Ads Data Again",
                     combined_data_stream,
