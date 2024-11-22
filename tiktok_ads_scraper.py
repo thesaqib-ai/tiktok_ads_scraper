@@ -5,7 +5,7 @@ import re
 import streamlit as st
 from io import BytesIO
 
-def combine_excel_sheets(input_file, output_file):
+def combine_excel_sheets(input_file):
     """
     Combines all sheets from an Excel file into a single sheet and returns it as a BytesIO object.
     
@@ -46,6 +46,77 @@ def sanitize_string(value):
     return value
 
 def getTikTokAds():
+    # Custom CSS styling
+    st.markdown("""
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+            body {
+                background-color: #f0f2f6;
+                font-family: 'Montserrat', sans-serif;
+            }
+            .stApp {
+                background-image: url('https://images.unsplash.com/photo-1564750566895-e0a4857846f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80');
+                background-size: cover;
+                background-position: center;
+            }
+            h1 {
+                color: #ffffff;
+                text-align: center;
+                font-weight: 700;
+                font-size: 3em;
+                margin-top: 0.5em;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            }
+            .stButton>button {
+                background-color: #1DA1F2;
+                color: #ffffff;
+                border: none;
+                padding: 0.75em 1.5em;
+                font-size: 1em;
+                font-weight: 700;
+                border-radius: 8px;
+                margin: 0 auto;
+                display: block;
+                box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            }
+            .stButton>button:hover {
+                background-color: #0d95e8;
+                cursor: pointer;
+            }
+            .css-1kyxreq {
+                background-color: rgba(255, 255, 255, 0.85);
+                padding: 2em;
+                border-radius: 15px;
+            }
+            .download-section {
+                text-align: center;
+                margin-top: 2em;
+                background-color: rgba(255, 255, 255, 0.85);
+                padding: 2em;
+                border-radius: 15px;
+            }
+            .download-button {
+                background-color: #28a745;
+                color: #ffffff;
+                border: none;
+                padding: 0.75em 1.5em;
+                font-size: 1em;
+                font-weight: 700;
+                border-radius: 8px;
+                margin: 1em;
+                box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            }
+            .download-button:hover {
+                background-color: #218838;
+                cursor: pointer;
+            }
+            .stSpinner>div>div {
+                border-top-color: #1DA1F2;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     st.title('TikTok Ads Scraper')
 
     # Initialize session state to store Excel files
@@ -62,10 +133,7 @@ def getTikTokAds():
                 json_data = json.loads(data)
 
                 industry_ids = [
-                    "22102000000", "22101000000", 
-                    # "22107000000", "22108000000", 
-                    # "22109000000", "22106000000", "22999000000", "22112000000"
-                    # Add more IDs as required...
+                    "22102000000", "22101000000"
                 ]
                 x_rapidapi_key = st.secrets["X-RAPIDAPI-KEY"]
                 url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads"
@@ -150,26 +218,29 @@ def getTikTokAds():
 
     # Display download buttons only if the Excel files are available
     if st.session_state.secondary_excel_stream and st.session_state.main_excel_stream:
-        combined_data_stream = combine_excel_sheets(st.session_state.secondary_excel_stream, None)
+        combined_data_stream = combine_excel_sheets(st.session_state.secondary_excel_stream)
         
-        st.markdown("### Download Files")
+        st.markdown("<div class='download-section'><h3>Download Files</h3>", unsafe_allow_html=True)
         col1, col2 = st.columns(2)
 
         with col1:
             st.download_button(
-                label="Download Combined Top Ads Data",
+                label="Download Top Ads Data",
                 data=combined_data_stream,
-                file_name="combined_top_tiktok_ads_data.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                file_name="top_tiktok_ads_data.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key='download-top',
             )
 
         with col2:
             st.download_button(
                 label="Download All Ads Data",
                 data=st.session_state.main_excel_stream,
-                file_name="tik_ads_data.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                file_name="tiktok_ads_data.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key='download-all',
             )
+        st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     getTikTokAds()
