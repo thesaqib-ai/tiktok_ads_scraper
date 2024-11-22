@@ -45,29 +45,6 @@ def sanitize_string(value):
         return re.sub(r'[\x00-\x1F\x7F]', '', value)
     return value
 
-def load_categories(json_data):
-    """
-    Flattens the categories and subcategories into a list of dictionaries.
-    
-    Parameters:
-    json_data (list): The JSON data containing categories and subcategories.
-    
-    Returns:
-    list: A list of dictionaries with 'Industry ID' and 'Industry Name'.
-    """
-    categories_list = []
-    for category in json_data:
-        categories_list.append({
-            "Industry ID": category.get("id", ""),
-            "Industry Name": category.get("name", "")
-        })
-        for sub_category in category.get("sub_industry", []):
-            categories_list.append({
-                "Industry ID": sub_category.get("id", ""),
-                "Industry Name": sub_category.get("name", "")
-            })
-    return categories_list
-
 def getTikTokAds():
     # Custom CSS styling
     st.markdown("""
@@ -132,7 +109,7 @@ def getTikTokAds():
             }
             /* Additional styling for the About section and categories table */
             .about-section {
-                background-color: rgba(255, 255, 255, 0.85);
+                background-color: rgba(0, 0, 0, 0);
                 padding: 1em;
                 border-radius: 10px;
                 margin-bottom: 2em;
@@ -160,25 +137,6 @@ def getTikTokAds():
             </p>
         </div>
     """, unsafe_allow_html=True)
-
-    # Load and Display Categories
-    try:
-        categories_json = st.secrets["CATEGORIES_JSON"]
-        json_data = json.loads(categories_json)
-        categories_list = load_categories(json_data)
-        categories_df = pd.DataFrame(categories_list)
-
-        st.markdown("""
-            <div class='categories-section'>
-                <h2>Ad Categories</h2>
-            </div>
-        """, unsafe_allow_html=True)
-
-        st.dataframe(categories_df, use_container_width=True)
-    except KeyError:
-        st.error("CATEGORIES_JSON not found in Streamlit secrets.")
-    except json.JSONDecodeError:
-        st.error("Error decoding CATEGORIES_JSON. Please check the JSON format.")
 
     # Initialize session state to store Excel files
     if 'main_excel_stream' not in st.session_state:
