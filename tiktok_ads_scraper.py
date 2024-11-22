@@ -54,7 +54,7 @@ def getTikTokAds():
             json_data = json.loads(data)
 
             industry_ids = [
-                "22102000000", "22101000000", 
+                "22102000000", "22101000000",
                 # "22107000000", "22108000000", "22109000000", "22106000000", "22999000000", "22112000000"
                 # Add more IDs as required...
             ]
@@ -133,21 +133,37 @@ def getTikTokAds():
             # Create a downloadable combined Excel file.
             combined_data_stream = combine_excel_sheets(secondary_excel_stream, None)
 
-            # Add download button for the main data as well.
+            if 'combined_data_downloaded' not in st.session_state:
+                st.session_state['combined_data_downloaded'] = False
+
+            # Show the first download button for the all ads data
             st.download_button(
                 "Download All Ads Data",
                 main_excel_stream,
-                file_name="tik_ads_data.xlsx",
+                file_name="tiktok_ads_data.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            # Add download button for the combined data.
-            st.download_button(
-                "Download Combined Top Ads Data",
-                combined_data_stream,
-                file_name="combined_top_tiktok_ads_data.xlsx",
-                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-            )
+            # Show the second download button for the combined top ads if it has not been downloaded yet
+            if not st.session_state['combined_data_downloaded']:
+                download_button = st.download_button(
+                    "Download Combined Top Ads Data",
+                    combined_data_stream,
+                    file_name="combined_top_tiktok_ads_data.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
+                # Mark the combined data as downloaded when the button is clicked
+                if download_button:
+                    st.session_state['combined_data_downloaded'] = True
+            else:
+                # If combined data was already downloaded, allow the user to re-download it
+                st.download_button(
+                    "Download Combined Top Ads Data Again",
+                    combined_data_stream,
+                    file_name="combined_top_tiktok_ads_data.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
 
 if __name__ == "__main__":
     getTikTokAds()
