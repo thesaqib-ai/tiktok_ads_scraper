@@ -296,7 +296,7 @@ def getTikTokAds():
     # Display categories in a scrollable container
     with st.container():
         for category in ad_categories:
-            st.markdown(f"- **{category}**")
+            st.markdown(f"Below is the list of all ad categories:\n- **{category}**")
 
 
 if __name__ == "__main__":
