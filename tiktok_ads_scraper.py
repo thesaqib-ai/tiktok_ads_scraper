@@ -197,7 +197,7 @@ def getTikTokAds():
                                         }
                                         all_ad_data.append(ad_data)
 
-                                        if float(ad.get('ctr', 0)) >= 0.05 and int(ad.get('like', 0)) >= 2000 and int(detailed_ads.get('comment', 0)) >= 150:
+                                        if float(ad.get('ctr', 0)) >= 0.1 and int(ad.get('like', 0)) >= 2000 and int(detailed_ads.get('comment', 0)) >= 200:
                                             filtered_ad_data.append(ad_data)
                                     except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
                                         st.error(f"Error processing ad {ad.get('id')}: {e}")
