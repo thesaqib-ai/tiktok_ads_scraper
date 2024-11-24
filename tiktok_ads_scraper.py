@@ -189,7 +189,7 @@ def getTikTokAds():
                                 "country": "US",
                                 "order_by": "ctr",
                                 "like": "1",
-                                "ad_format": "2",
+                                "ad_format": "1",
                                 "industry": industry_id,
                                 "ad_language": "en"
                             }
