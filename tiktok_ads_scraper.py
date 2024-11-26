@@ -186,7 +186,7 @@ def getTikTokAds():
                                 "page": str(page),
                                 "period": "7",
                                 "limit": "10",
-                                # "country": "US",
+                                "country": "US",
                                 "order_by": "ctr",
                                 "like": "1,2,3,4,5",
                                 "ad_format": "2",
