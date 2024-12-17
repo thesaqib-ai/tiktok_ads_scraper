@@ -144,6 +144,14 @@ def getTikTokAds():
     if 'secondary_excel_stream' not in st.session_state:
         st.session_state.secondary_excel_stream = None
 
+
+    # Select menu for ad format
+    ad_format_options = {"Spark Ads": "1", "Non-Spark Ads": "2"}
+    selected_ad_format = st.selectbox("Select Ad Format", list(ad_format_options.keys()))
+    
+    # Use the selected ad format in the querystring
+    ad_format_value = ad_format_options[selected_ad_format]
+    
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
             try:
@@ -151,7 +159,7 @@ def getTikTokAds():
                 if 'json_data' not in locals():
                     data = st.secrets["CATEGORIES_JSON"]
                     json_data = json.loads(data)
-
+    
                 industry_ids = [
                     "22102000000", "22101000000", "22107000000", "22108000000", "22109000000", "22106000000", "22999000000", "22112000000",
                     "22105000000", "22113000000", "22110000000", "22111000000", "16105000000", "16104000000", "16100000000", "11102000000",
@@ -170,10 +178,10 @@ def getTikTokAds():
                     "x-rapidapi-key": x_rapidapi_key,
                     "x-rapidapi-host": "tiktok-api23.p.rapidapi.com"
                 }
-
+    
                 main_excel_stream = BytesIO()
                 secondary_excel_stream = BytesIO()
-
+    
                 with pd.ExcelWriter(main_excel_stream, engine='openpyxl') as writer_main, \
                      pd.ExcelWriter(secondary_excel_stream, engine='openpyxl') as writer_secondary:
                     for industry_id in industry_ids:
@@ -189,16 +197,15 @@ def getTikTokAds():
                                 "country": "US",
                                 "order_by": "ctr",
                                 "like": "1",
-                                "ad_format": "2",
+                                "ad_format": ad_format_value, 
                                 "industry": industry_id,
                                 "ad_language": "en"
                             }
-
                             try:
                                 response = requests.get(url, headers=headers, params=querystring)
                                 response.raise_for_status()
                                 ads = response.json().get('data', {}).get('materials', [])
-
+    
                                 for ad in ads:
                                     try:
                                         details_url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads/detail"
@@ -206,7 +213,7 @@ def getTikTokAds():
                                         ads_response = requests.get(details_url, headers=headers, params=details_querystring)
                                         ads_response.raise_for_status()
                                         detailed_ads = ads_response.json().get('data', {})
-
+    
                                         ad_data = {
                                             "Ad ID": ad.get('id'),
                                             "Brand Name": sanitize_string(ad.get('brand_name')),
@@ -223,28 +230,28 @@ def getTikTokAds():
                                             "Ad Description": sanitize_string(ad.get('ad_title'))
                                         }
                                         all_ad_data.append(ad_data)
-
+    
                                         if float(ad.get('ctr', 0)) >= 0.1 and int(ad.get('like', 0)) >= 2000 and int(detailed_ads.get('comment', 0)) >= 200:
                                             filtered_ad_data.append(ad_data)
                                     except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
                                         st.error(f"Error processing ad {ad.get('id')}: {e}")
                             except (requests.exceptions.RequestException, json.JSONDecodeError) as e:
                                 st.error(f"Error retrieving data for industry {industry_id} on page {page}: {e}")
-
+    
                         # Write all ads data to the main Excel file
                         pd.DataFrame(all_ad_data).to_excel(writer_main, index=False, sheet_name=sheet_name)
                         # Write filtered ads data to the secondary Excel file
                         pd.DataFrame(filtered_ad_data).to_excel(writer_secondary, index=False, sheet_name=sheet_name)
-
-                # Store the Excel streams in session state
+    
+                # Save the final Excel files
                 st.session_state.main_excel_stream = main_excel_stream
                 st.session_state.secondary_excel_stream = secondary_excel_stream
-
-                st.success("Ads data processed successfully!")
-
+    
+                st.success("Scraping completed successfully!")
+    
             except Exception as e:
                 st.error(f"An unexpected error occurred: {e}")
-
+                
     # Display download buttons only if the Excel files are available
     if st.session_state.secondary_excel_stream and st.session_state.main_excel_stream:
         combined_data_stream = combine_excel_sheets(st.session_state.secondary_excel_stream)
