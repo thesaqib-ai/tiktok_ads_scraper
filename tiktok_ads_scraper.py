@@ -191,14 +191,12 @@ def getTikTokAds():
     ad_format_value = ad_format_options[selected_ad_format]
     
     st.markdown("<h3>Select Categories</h3>", unsafe_allow_html=True)
-    selected_categories = st.multiselect(
-        "Select Categories",
-        options=category_names,  # List of category names
-        default=category_names   # By default, all are selected
-    )
-    
-    selected_ids = [categories_dict[category] for category in selected_categories]
-    
+    selected_categories = []
+    for category_name, category_id in zip(category_names, category_ids):
+        is_checked = st.checkbox(f"{category_name} ({category_id})", value=True)
+        if is_checked:
+            selected_categories.append(category_id)
+            
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
             try:
@@ -219,7 +217,7 @@ def getTikTokAds():
     
                 with pd.ExcelWriter(main_excel_stream, engine='openpyxl') as writer_main, \
                      pd.ExcelWriter(secondary_excel_stream, engine='openpyxl') as writer_secondary:
-                    for industry_id in selected_ids:
+                    for industry_id in selected_categories:
                         industry_name = get_industry_name(industry_id, json_data)
                         sheet_name = industry_name if industry_name != "-" else f"Industry_{industry_id}"
                         all_ad_data = []
