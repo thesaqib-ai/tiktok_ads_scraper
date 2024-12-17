@@ -193,7 +193,7 @@ def getTikTokAds():
     st.markdown("<h3>Select Categories</h3>", unsafe_allow_html=True)
     selected_categories = []
     for category_name, category_id in zip(category_names, category_ids):
-        is_checked = st.checkbox(f"{category_name} ({category_id})", value=True)
+        is_checked = st.checkbox(f"{category_name}", value=True)
         if is_checked:
             selected_categories.append(category_id)
             
