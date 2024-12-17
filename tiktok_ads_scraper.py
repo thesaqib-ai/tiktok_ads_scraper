@@ -5,46 +5,6 @@ import re
 import streamlit as st
 from io import BytesIO
 
-# Category Names and IDs
-category_names = [
-    "Bags", "Clothing Accessories", "High end Jewelry", "Mens Clothing", "Mens Shoes", 
-    "Ordinary Jewelry", "Other Apparel & Accessories", "Trad & Ceremonial Clothing", "Watches", 
-    "Wearable Tech Devices", "Womens Clothing", "Womens Shoes", "Digital Devices", "Home Appliances", 
-    "Personal Care Appliances", "Travel", "Baby Bedding", "Baby Feeding Supplies", "Baby Food", 
-    "Baby Formula", "Baby Hygiene Products", "Baby Shoes", "Child Car Seats", "Childrens Apparel", 
-    "Diapers & Baby Wipes", "Other Baby, Kids & Maternity", "Strollers & Cribs", "Toys for Kids", 
-    "Aesthetic Medicine", "Cosmetics", "Feminine Care", "Fragrances & Perfumes", "Haircare", 
-    "Oral Care", "Other Beauty & Personal Care", "Skincare", "Wig & Hair Styling", 
-    "Constructional Engineering", "Environmental Protection", "Legal Services", 
-    "Marketing & Advertising", "Other Business Services", "Professional Consultation", 
-    "Real Estate & Home Rentals", "Recruitment & Job Searching", "Big Box Retailers", 
-    "Small & Medium Platforms", "Education", "Overseas Education", "Astrology", 
-    "Beauty & Personal Care", "Business & Economy", "Collectables & Antiques", "Culture & Art", 
-    "Culture & History", "Food & Cooking", "Pets", "Other Pets", "Pet Grooming", "Pet Healthcare", 
-    "Pet Household Products", "Pet Toys", "Pet Travel Accessories", "Pet Treats", "Petfood", 
-    "Outdoor Equipment", "Sports & Equipment", "Cell Phones", "Computer Accessories", 
-    "Computer Repair", "Computers", "Computers Components", "Gaming Devices", "Network Products", 
-    "Office Equipment", "Tech & Electronics", "Accessories for Vehicles", "Auto Accessories", 
-    "Auto Parts"
-]
-
-category_ids = [
-    "22102000000", "22101000000", "22107000000", "22108000000", "22109000000", 
-    "22106000000", "22999000000", "22112000000", "22105000000", "22113000000", 
-    "22110000000", "22111000000", "16105000000", "16104000000", "16100000000", "20108000000", 
-    "12104000000", "12108000000", "12100000000", "12102000000", "12110000000", "12105000000", 
-    "12107000000", "12109000000", "12103000000", "12999000000", "12101000000", "12106000000", 
-    "14105000000", "14104000000", "14107000000", "14106000000", "14101000000", "14100000000", 
-    "14999000000", "14103000000", "14102000000", "24103000000", "24109000000", "24117000000", 
-    "24112000000", "24999000000", "24113000000", "24100000000", "24102000000", "30100000000", 
-    "30101000000", "10000000000", "10103000000", "23114000000", "23122000000", "23102000000", 
-    "23111000000", "23116000000", "23104000000", "23124000000", "19000000000", "19999000000", 
-    "19103000000", "19101000000", "19102000000", "19105000000", "19106000000", "19104000000", 
-    "19100000000", "28100000000", "28101000000", "15100000000", "15105000000", "15103000000", 
-    "15101000000", "15102000000", "15104000000", "15106000000", "15107000000", "15999000000", 
-    "11111000000", "11101000000", "11103000000"
-]
-
 def combine_excel_sheets(input_file):
     """
     Combines all sheets from an Excel file into a single sheet and returns it as a BytesIO object.
@@ -86,6 +46,44 @@ def sanitize_string(value):
     return value
 
 def getTikTokAds():
+    category_names = [
+        "Bags", "Clothing Accessories", "High end Jewelry", "Mens Clothing", "Mens Shoes", 
+        "Ordinary Jewelry", "Other Apparel & Accessories", "Trad & Ceremonial Clothing", "Watches", 
+        "Wearable Tech Devices", "Womens Clothing", "Womens Shoes", "Digital Devices", "Home Appliances", 
+        "Personal Care Appliances", "Travel", "Baby Bedding", "Baby Feeding Supplies", "Baby Food", 
+        "Baby Formula", "Baby Hygiene Products", "Baby Shoes", "Child Car Seats", "Childrens Apparel", 
+        "Diapers & Baby Wipes", "Other Baby, Kids & Maternity", "Strollers & Cribs", "Toys for Kids", 
+        "Aesthetic Medicine", "Cosmetics", "Feminine Care", "Fragrances & Perfumes", "Haircare", 
+        "Oral Care", "Other Beauty & Personal Care", "Skincare", "Wig & Hair Styling", 
+        "Constructional Engineering", "Environmental Protection", "Legal Services", 
+        "Marketing & Advertising", "Other Business Services", "Professional Consultation", 
+        "Real Estate & Home Rentals", "Recruitment & Job Searching", "Big Box Retailers", 
+        "Small & Medium Platforms", "Education", "Overseas Education", "Astrology", 
+        "Beauty & Personal Care", "Business & Economy", "Collectables & Antiques", "Culture & Art", 
+        "Culture & History", "Food & Cooking", "Pets", "Other Pets", "Pet Grooming", "Pet Healthcare", 
+        "Pet Household Products", "Pet Toys", "Pet Travel Accessories", "Pet Treats", "Petfood", 
+        "Outdoor Equipment", "Sports & Equipment", "Cell Phones", "Computer Accessories", 
+        "Computer Repair", "Computers", "Computers Components", "Gaming Devices", "Network Products", 
+        "Office Equipment", "Tech & Electronics", "Accessories for Vehicles", "Auto Accessories", 
+        "Auto Parts"
+    ]
+
+    category_ids = [
+        "22102000000", "22101000000", "22107000000", "22108000000", "22109000000", 
+        "22106000000", "22999000000", "22112000000", "22105000000", "22113000000", 
+        "22110000000", "22111000000", "16105000000", "16104000000", "16100000000", "20108000000", 
+        "12104000000", "12108000000", "12100000000", "12102000000", "12110000000", "12105000000", 
+        "12107000000", "12109000000", "12103000000", "12999000000", "12101000000", "12106000000", 
+        "14105000000", "14104000000", "14107000000", "14106000000", "14101000000", "14100000000", 
+        "14999000000", "14103000000", "14102000000", "24103000000", "24109000000", "24117000000", 
+        "24112000000", "24999000000", "24113000000", "24100000000", "24102000000", "30100000000", 
+        "30101000000", "10000000000", "10103000000", "23114000000", "23122000000", "23102000000", 
+        "23111000000", "23116000000", "23104000000", "23124000000", "19000000000", "19999000000", 
+        "19103000000", "19101000000", "19102000000", "19105000000", "19106000000", "19104000000", 
+        "19100000000", "28100000000", "28101000000", "15100000000", "15105000000", "15103000000", 
+        "15101000000", "15102000000", "15104000000", "15106000000", "15107000000", "15999000000", 
+        "11111000000", "11101000000", "11103000000"
+    ]
     # Custom CSS styling
     st.markdown("""
         <style>
