@@ -87,19 +87,6 @@ def getTikTokAds():
     # Custom CSS styling
     st.markdown("""
         <style>
-        div[data-baseweb="select"] > div {
-            background-color: white;  /* Background color of the dropdown */
-        }
-        div[data-baseweb="select"] span {
-            color: blue !important;  /* Color of selected items */
-        }
-        div[data-baseweb="select"] span[aria-selected="true"] {
-            background-color: lightblue !important; /* Highlight color */
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    st.markdown("""
-        <style>
             @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 
             body {
