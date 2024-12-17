@@ -189,6 +189,14 @@ def getTikTokAds():
     
     # Use the selected ad format in the querystring
     ad_format_value = ad_format_options[selected_ad_format]
+
+    # Checkbox selection for categories
+    st.markdown("<h3>Select Categories</h3>", unsafe_allow_html=True)
+    selected_categories = []
+    for category_name, category_id in zip(category_names, category_ids):
+        is_checked = st.checkbox(f"{category_name} ({category_id})", value=True)
+        if is_checked:
+            selected_categories.append(category_id)
     
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
@@ -197,19 +205,7 @@ def getTikTokAds():
                 if 'json_data' not in locals():
                     data = st.secrets["CATEGORIES_JSON"]
                     json_data = json.loads(data)
-    
-                industry_ids = ["22102000000"
-                    # "22102000000", "22101000000", "22107000000", "22108000000", "22109000000", "22106000000", "22999000000", "22112000000",
-                    # "22105000000", "22113000000", "22110000000", "22111000000", "16105000000", "16104000000", "16100000000", "11102000000",
-                    # "20108000000", "12104000000", "12108000000", "12107000000", "12109000000", "12999000000", "12106000000", "14105000000",
-                    # "14104000000", "14107000000", "14106000000", "14101000000", "14100000000", "14103000000", "14102000000", "24103000000",
-                    # "24109000000", "24117000000", "24112000000", "24999000000", "24113000000", "24100000000", "24102000000", "30100000000",
-                    # "30101000000", "10000000000", "10103000000", "23114000000", "23122000000", "23102000000", "23111000000", "23116000000",
-                    # "23104000000", "23107000000", "23124000000", "19000000000", "19999000000", "19103000000", "19101000000", "19102000000",
-                    # "19105000000", "19106000000", "19104000000", "19100000000", "28100000000", "28101000000", "15100000000", "15105000000",
-                    # "15103000000", "15101000000", "15102000000", "15104000000", "15106000000", "15107000000", "15999000000", "11111000000",
-                    # "11101000000", "11103000000"
-                ]
+
                 x_rapidapi_key = st.secrets["X-RAPIDAPI-KEY"]
                 url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads"
                 headers = {
@@ -222,7 +218,7 @@ def getTikTokAds():
     
                 with pd.ExcelWriter(main_excel_stream, engine='openpyxl') as writer_main, \
                      pd.ExcelWriter(secondary_excel_stream, engine='openpyxl') as writer_secondary:
-                    for industry_id in industry_ids:
+                    for industry_id in selected_categories:
                         industry_name = get_industry_name(industry_id, json_data)
                         sheet_name = industry_name if industry_name != "-" else f"Industry_{industry_id}"
                         all_ad_data = []
