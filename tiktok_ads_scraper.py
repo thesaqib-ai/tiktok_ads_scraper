@@ -196,7 +196,8 @@ def getTikTokAds():
         options=category_names,  # List of category names
         default=category_names   # By default, all are selected
     )
-  
+    
+    selected_ids = [categories_dict[category] for category in selected_categories]
     
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
@@ -218,7 +219,7 @@ def getTikTokAds():
     
                 with pd.ExcelWriter(main_excel_stream, engine='openpyxl') as writer_main, \
                      pd.ExcelWriter(secondary_excel_stream, engine='openpyxl') as writer_secondary:
-                    for industry_id in selected_categories:
+                    for industry_id in selected_ids:
                         industry_name = get_industry_name(industry_id, json_data)
                         sheet_name = industry_name if industry_name != "-" else f"Industry_{industry_id}"
                         all_ad_data = []
