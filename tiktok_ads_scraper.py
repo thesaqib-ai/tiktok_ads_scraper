@@ -189,14 +189,14 @@ def getTikTokAds():
     
     # Use the selected ad format in the querystring
     ad_format_value = ad_format_options[selected_ad_format]
-
-    # Checkbox selection for categories
+    
     st.markdown("<h3>Select Categories</h3>", unsafe_allow_html=True)
-    selected_categories = []
-    for category_name, category_id in zip(category_names, category_ids):
-        is_checked = st.checkbox(f"{category_name} ({category_id})", value=True)
-        if is_checked:
-            selected_categories.append(category_id)
+    selected_categories = st.multiselect(
+        "Select Categories",
+        options=category_names,  # List of category names
+        default=category_names   # By default, all are selected
+    )
+  
     
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
