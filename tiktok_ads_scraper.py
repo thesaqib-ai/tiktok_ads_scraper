@@ -321,7 +321,7 @@ def getTikTokAds():
     st.sidebar.write("Explore all categories below:")
     
     # Display categories in the sidebar
-    for category in ad_categories:
+    for category in category_names:
         st.sidebar.markdown(f"- {category_names}")
 
 
