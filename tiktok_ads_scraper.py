@@ -322,7 +322,7 @@ def getTikTokAds():
     
     # Display categories in the sidebar
     for category in category_names:
-        st.sidebar.markdown(f"- {category_names}")
+        st.sidebar.markdown(f"- {category}")
 
 
 if __name__ == "__main__":
