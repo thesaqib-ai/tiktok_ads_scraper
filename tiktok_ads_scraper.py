@@ -280,18 +280,22 @@ def getTikTokAds():
         "VN": "Vietnam"
     }
 
-    # Multiselect for countries
+    # Generate country options as a list of tuples (country_name, country_code)
     country_options = [(country_name, country_code) for country_code, country_name in country_codes.items()]
+    
+    # Default should be in the same format as the options (country_name, country_code)
+    default_countries = [("United States", "US")]  # Correct the default format
+    
+    # Multiselect for countries
     selected_countries = st.multiselect(
         "Select Countries:", 
         options=country_options, 
         format_func=lambda x: x[0],  # Display country name to the user
-        default=[country_codes["US"]]  # Default to the United States
+        default=default_countries  # Use the country names and codes as defaults
     )
     
     # Extract selected country codes from the selected options
-    selected_countries_query = ",".join([country_code for country_name, country_code in selected_countries]) 
-    
+    selected_countries_query = ",".join([country_code for _, country_code in selected_countries])
 
     
     # Multiselect for categories
