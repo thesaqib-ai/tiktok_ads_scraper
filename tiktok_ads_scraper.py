@@ -312,7 +312,7 @@ def getTikTokAds():
     
                 with pd.ExcelWriter(main_excel_stream, engine='openpyxl') as writer_main, \
                      pd.ExcelWriter(secondary_excel_stream, engine='openpyxl') as writer_secondary:
-                    for industry_id in selected_categories:
+                    for industry_id in selected_categories_ids:
                         industry_name = get_industry_name(industry_id, json_data)
                         sheet_name = industry_name if industry_name != "-" else f"Industry_{industry_id}"
                         all_ad_data = []
