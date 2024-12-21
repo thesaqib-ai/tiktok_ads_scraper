@@ -417,13 +417,6 @@ def getTikTokAds():
             )
         st.markdown("</div>", unsafe_allow_html=True)
         
-    # Sidebar for categories
-    st.sidebar.title("Ad Categories")
-    st.sidebar.write("Explore all categories below:")
-    
-    # Display categories in the sidebar
-    for category in category_names:
-        st.sidebar.markdown(f"- {category}")
 
 
 if __name__ == "__main__":
