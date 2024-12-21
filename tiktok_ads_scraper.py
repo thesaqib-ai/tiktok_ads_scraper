@@ -280,15 +280,14 @@ def getTikTokAds():
         "VN": "Vietnam"
     }
 
+    # Multiselect for countries
     selected_countries = st.multiselect("Select Countries:", list(country_codes.keys()), default=["US"])
     selected_countries_query = ",".join(selected_countries)
     
-    st.markdown("<h3>Select Categories</h3>", unsafe_allow_html=True)
-    selected_categories = []
-    for category_name, category_id in zip(category_names, category_ids):
-        is_checked = st.checkbox(f"{category_name}", value=True)
-        if is_checked:
-            selected_categories.append(category_id)
+    # Multiselect for categories
+    selected_categories = st.multiselect("Select Categories:", category_names, default=category_names)  # You can set default categories here
+    selected_categories_ids = [category_ids[category_names.index(category)] for category in selected_categories]
+
     
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
