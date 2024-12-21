@@ -281,10 +281,17 @@ def getTikTokAds():
     }
 
     # Multiselect for countries
-    selected_countries = st.multiselect("Select Countries:", list(country_codes.keys()), default=["US"])
+    country_options = [(country_name, country_code) for country_code, country_name in country_codes.items()]
+    selected_countries = st.multiselect(
+        "Select Countries:", 
+        options=country_options, 
+        format_func=lambda x: x[0],  # Display country name to the user
+        default=[country_codes["US"]]  # Default to the United States
+    )
     
-    # Only join with commas if there is more than one country selected
-    selected_countries_query = ",".join(selected_countries) if len(selected_countries) > 1 else selected_countries[0]
+    # Extract selected country codes from the selected options
+    selected_countries_query = ",".join([country_code for country_name, country_code in selected_countries]) 
+    
 
     
     # Multiselect for categories
