@@ -182,7 +182,6 @@ def getTikTokAds():
     if 'secondary_excel_stream' not in st.session_state:
         st.session_state.secondary_excel_stream = None
 
-
     # Select menu for ad format
     ad_format_options = {"Spark Ads": "1", "Non-Spark Ads": "2"}
     selected_ad_format = st.selectbox("Select Ad Format", list(ad_format_options.keys()))
@@ -190,13 +189,63 @@ def getTikTokAds():
     # Use the selected ad format in the querystring
     ad_format_value = ad_format_options[selected_ad_format]
     
+    # Ask user for the number of pages
+    num_pages = st.number_input("Enter the number of pages to retrieve ads from:", min_value=1, value=10)
+    
+    # Ask user to select the ad period
+    ad_period = st.selectbox("Select Ad Period (days):", [7, 30, 180])
+    
+    # Ask user to select countries
+    country_codes = {
+        "US": "United States",
+        "GB": "United Kingdom",
+        "DE": "Germany",
+        "IT": "Italy",
+        "CA": "Canada",
+        "AU": "Australia",
+        "ES": "Spain",
+        "GR": "Greece",
+        "NL": "Netherlands",
+        "DK": "Denmark",
+        "SK": "Slovakia",
+        "BE": "Belgium",
+        "NO": "Norway",
+        "FR": "France",
+        "AT": "Austria",
+        "BN": "Brunei",
+        "CH": "Switzerland",
+        "CY": "Cyprus",
+        "CZ": "Czech Republic",
+        "EE": "Estonia",
+        "FI": "Finland",
+        "HU": "Hungary",
+        "LT": "Lithuania",
+        "LV": "Latvia",
+        "NZ": "New Zealand",
+        "PL": "Poland",
+        "PT": "Portugal",
+        "RU": "Russia",
+        "SG": "Singapore",
+        "SM": "San Marino",
+        "SI": "Slovenia",
+        "SE": "Sweden",
+        "TH": "Thailand",
+        "TR": "Turkey",
+        "TW": "Taiwan",
+        "UA": "Ukraine",
+        "MA": "Morocco",
+        "MT": "Malta"
+    }
+    selected_countries = st.multiselect("Select Countries:", list(country_codes.keys()), default=["US"])
+    selected_countries_query = ",".join(selected_countries)
+    
     st.markdown("<h3>Select Categories</h3>", unsafe_allow_html=True)
     selected_categories = []
     for category_name, category_id in zip(category_names, category_ids):
         is_checked = st.checkbox(f"{category_name}", value=True)
         if is_checked:
             selected_categories.append(category_id)
-            
+    
     if st.button("Start Scraping Ads"):
         with st.spinner("Fetching TikTok Ads..."):
             try:
@@ -204,7 +253,7 @@ def getTikTokAds():
                 if 'json_data' not in locals():
                     data = st.secrets["CATEGORIES_JSON"]
                     json_data = json.loads(data)
-
+    
                 x_rapidapi_key = st.secrets["X-RAPIDAPI-KEY"]
                 url = "https://tiktok-api23.p.rapidapi.com/api/trending/ads"
                 headers = {
@@ -222,15 +271,15 @@ def getTikTokAds():
                         sheet_name = industry_name if industry_name != "-" else f"Industry_{industry_id}"
                         all_ad_data = []
                         filtered_ad_data = []
-                        for page in range(1, 11):
+                        for page in range(1, num_pages + 1):
                             querystring = {
                                 "page": str(page),
-                                "period": "7",
+                                "period": str(ad_period),
                                 "limit": "10",
-                                "country": "US",
+                                "country": selected_countries_query,
                                 "order_by": "ctr",
                                 "like": "1",
-                                "ad_format": ad_format_value, 
+                                "ad_format": ad_format_value,
                                 "industry": industry_id,
                                 "ad_language": "en"
                             }
