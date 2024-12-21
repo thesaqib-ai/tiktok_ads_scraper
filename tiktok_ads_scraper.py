@@ -281,7 +281,7 @@ def getTikTokAds():
                                 "like": "1",
                                 "ad_format": ad_format_value,
                                 "industry": industry_id,
-                                "ad_language": "en"
+                                # "ad_language": "en"
                             }
                             try:
                                 response = requests.get(url, headers=headers, params=querystring)
