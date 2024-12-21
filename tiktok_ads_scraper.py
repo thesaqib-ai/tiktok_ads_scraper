@@ -285,7 +285,7 @@ def getTikTokAds():
     selected_countries_query = ",".join(selected_countries)
     
     # Multiselect for categories
-    selected_categories = st.multiselect("Select Categories:", category_names, default=category_names)  # You can set default categories here
+    selected_categories = st.multiselect("Select Categories:", category_names, default=["Bags"]) 
     selected_categories_ids = [category_ids[category_names.index(category)] for category in selected_categories]
 
     
